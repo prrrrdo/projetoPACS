@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGMaH - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="app-container">
+        <!-- Header/Logo -->
+        <header class="brand-header">
+            <div class="logo-badge">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path
+                        d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+                    <path d="M12 5v16" />
+                </svg>
+            </div>
+            <h1 class="brand-title">SIGMaH</h1>
+            <p class="brand-subtitle">Sistema Integrado de Gestão de Manutenção Hospitalar</p>
+        </header>
+
+        <!-- Main Card -->
+        <main class="login-card">
+            <div class="card-header">
+                <h2>Acesso ao Sistema</h2>
+                <p>Informe suas credenciais para continuar</p>
+            </div>
+
+            <form id="loginForm" class="login-form">
+                <!-- Usuario / Matricula -->
+                <div class="form-group">
+                    <label for="username">Usuário ou Matrícula</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                        <input type="text" id="username" placeholder="Digite seu usuário ou número de matrícula"
+                            required autocomplete="username">
+                    </div>
+                </div>
+
+                <!-- Senha -->
+                <div class="form-group">
+                    <div class="label-row">
+                        <label for="password">Senha</label>
+                        <button type="button" class="btn-link" id="btnOpenForgot">Esqueci minha senha</button>
+                    </div>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                        </svg>
+                        <input type="password" id="password" placeholder="••••••••" required
+                            autocomplete="current-password">
+                    </div>
+                </div>
+
+                <!-- Opções adicionais -->
+                <div class="form-options">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="rememberMe">
+                        <span class="checkmark"></span>
+                        Lembrar neste dispositivo
+                    </label>
+                </div>
+
+                <!-- Ações -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+                    <button type="button" class="btn btn-secondary btn-block" id="btnOpenRegister">Efetuar Cadastro</button>
+                </div>
+            </form>
+        </main>
+
+        <!-- Footer -->
+        <footer class="app-footer">
+            <p>&copy; 2026 SIGMaH • Gestão de Manutenção Hospitalar</p>
+        </footer>
+    </div>
+
+    <!-- Modal: Esqueci Minha Senha -->
+    <div class="modal-overlay" id="modalForgot">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Recuperação de Senha</h3>
+                <button type="button" class="modal-close btnCloseForgot">&times;</button>
+            </div>
+            <form id="forgotForm">
+                <div class="modal-body">
+                    <p class="modal-description">Insira seu e-mail institucional ou matrícula cadastrada para receber as instruções de redefinição.</p>
+                    <div class="form-group">
+                        <label for="recoveryInput">E-mail ou Matrícula</label>
+                        <input type="text" id="recoveryInput" placeholder="nome@hospital.gov.br ou 12345" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost btnCloseForgot">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Enviar Instruções</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Efetuar Cadastro -->
+    <div class="modal-overlay" id="modalRegister">
+        <div class="modal modal-lg">
+            <div class="modal-header">
+                <h3>Solicitar Cadastro</h3>
+                <button type="button" class="modal-close btnCloseRegister">&times;</button>
+            </div>
+            <form id="registerForm">
+                <div class="modal-body">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="regFullName">Nome Completo</label>
+                            <input type="text" id="regFullName" placeholder="Nome completo" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regMatricula">Matrícula / ID</label>
+                            <input type="text" id="regMatricula" placeholder="Ex: 123456" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="regEmail">E-mail Institucional</label>
+                            <input type="email" id="regEmail" placeholder="usuario@hospital.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="regPosition">Cargo</label>
+                            <select id="regPosition" required>
+                                <option value="" disabled selected>Selecione seu cargo</option>
+                                <option value="enfermeiro">Enfermeiro</option>
+                                <option value="medico">Médico</option>
+                                <option value="tecnico-em-enfermagem">Técnico em Enfermagem</option>
+                                <option value="assistente-administrativo">Assistente Administrativo</option>
+                                <option value="dentista">Dentista</option>
+                                <option value="eletrotecnico">Eletrotécnico</option>
+                                <option value="outros">Outros</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Nova Linha: Unidade (PACS ou SAMU) e Ramal -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="regUnit">Unidade / Serviço</label>
+                            <select id="regUnit" required>
+                                <option value="" disabled selected>Selecione PACS ou SAMU</option>
+                                <option value="pacs">PACS</option>
+                                <option value="samu">SAMU</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="regRamal">Ramal / ID</label>
+                            <input type="text" id="regRamal" placeholder="Ex: 1234" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="regDepartment">Setor / Departamento</label>
+                            <select id="regDepartment" required>
+                                <option value="" disabled selected>Selecione seu setor</option>
+                                <option value="predial">Manutenção Predial</option>
+                                <option value="psiquiatria">Psiquiatria</option>
+                                <option value="pediatria">Pediatria</option>
+                                <option value="uti">UTI</option>
+                                <option value="odontologia">Odontologia</option>
+                                <option value="recepcao">Recepção</option>
+                                <option value="farmacia">Farmácia</option>
+                                <option value="nutricao">Nutrição</option>
+                                <option value="informatica">Informática</option>
+                                <option value="outros-setor">Outros</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="regPass">Senha</label>
+                            <input type="password" id="regPass" placeholder="Mínimo 8 caracteres" minlength="8" required>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label for="regPassConfirm">Confirmar Senha</label>
+                            <input type="password" id="regPassConfirm" placeholder="Repita a senha" minlength="8" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-ghost btnCloseRegister">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Solicitar Acesso</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Container de Toasts/Notificações -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
