@@ -12,25 +12,22 @@ const pool = new Pool({
     user: 'postgres',
     host: 'localhost',
     database: 'pacs_db',
-    password: 'Dorothy@456', // Lembre-se de colocar sua senha real aqui
+    password: 'Dorothy@456',
     port: 5432,
 });
 
-// Rota de Cadastro de Usuário
-// 1. Cadastro forçando o perfil de requisitante
+// 1. Cadastro de Usuário (requisitante)
 app.post('/api/register', async (req, res) => {
     const { nome, matricula, email, senha, cargo, unidade, setor, ramal } = req.body;
     try {
         const hashedPassword = await bcrypt.hash(senha, 10);
-
         const query = `
-        INSERT INTO users (nome, matricula, email, senha, cargo, unidade, setor, ramal, role)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'requisitante')
-        RETURNING id, nome, email, unidade;
-      `;
+            INSERT INTO users (nome, matricula, email, senha, cargo, unidade, setor, ramal, role)
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'requisitante')
+            RETURNING id, nome, email, unidade;
+        `;
         const values = [nome, matricula, email, hashedPassword, cargo, unidade, setor, ramal];
         const result = await pool.query(query, values);
-
         res.status(201).json({ message: 'Cadastro solicitado com sucesso!', user: result.rows[0] });
     } catch (err) {
         console.error(err);
@@ -38,7 +35,7 @@ app.post('/api/register', async (req, res) => {
     }
 });
 
-// 2. Login retornando o 'role'
+// 2. Login
 app.post('/api/login', async (req, res) => {
     const { identifier, senha } = req.body;
     try {
@@ -65,7 +62,7 @@ app.post('/api/login', async (req, res) => {
                 ramal: user.ramal,
                 unidade: user.unidade,
                 setor: user.setor,
-                role: user.role // <-- Essencial para o redirecionamento
+                role: user.role
             }
         });
     } catch (err) {
@@ -78,11 +75,11 @@ app.post('/api/login', async (req, res) => {
 app.get('/api/demands', async (req, res) => {
     try {
         const query = `
-        SELECT d.id, d.location, d.description, d.status, d.created_at, u.nome AS solicitante, u.unidade, u.setor 
-        FROM demands d
-        JOIN users u ON d.user_id = u.id
-        ORDER BY d.created_at DESC;
-      `;
+            SELECT d.id, d.location, d.description, d.status, d.created_at, u.nome AS solicitante, u.unidade, u.setor 
+            FROM demands d
+            JOIN users u ON d.user_id = u.id
+            ORDER BY d.created_at DESC;
+        `;
         const result = await pool.query(query);
         res.json(result.rows);
     } catch (err) {
@@ -91,39 +88,8 @@ app.get('/api/demands', async (req, res) => {
     }
 });
 
-// 4. Atualizar Status (Manutenção)
-app.patch('/api/demands/:id/status', async (req, res) => {
-    const { id } = req.params;
-    const { status } = req.body;
-    try {
-        const query = 'UPDATE demands SET status = $1 WHERE id = $2 RETURNING *;';
-        const result = await pool.query(query, [status, id]);
-        res.json({ message: 'Status atualizado!', demand: result.rows[0] });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Erro ao atualizar status.' });
-    }
-});
-
-// Rota para Criar Demanda (Ordens de Serviço)
-app.post('/api/demands', async (req, res) => {
-    const { userId, location, description } = req.body;
-    try {
-        const query = `
-      INSERT INTO demands (user_id, location, description, status)
-      VALUES ($1, $2, $3, 'Pendente')
-      RETURNING id, location, description, status, created_at;
-    `;
-        const result = await pool.query(query, [userId, location, description]);
-        res.status(201).json({ message: 'Demanda aberta com sucesso!', demand: result.rows[0] });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Erro ao registrar demanda.' });
-    }
-});
-
-// Rota para Listar as Demandas de um usuário
-app.get('/api/demands/:userId', async (req, res) => {
+// 4. Listar as Demandas de um usuário específico (DEVE vir ANTES de /:id)
+app.get('/api/demands/user/:userId', async (req, res) => {
     const { userId } = req.params;
     try {
         const query = 'SELECT * FROM demands WHERE user_id = $1 ORDER BY created_at DESC';
@@ -131,22 +97,22 @@ app.get('/api/demands/:userId', async (req, res) => {
         res.json(result.rows);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Erro ao buscar demandas.' });
+        res.status(500).json({ error: 'Erro ao buscar demandas do usuário.' });
     }
 });
 
-// 1. Buscar detalhes de UMA demanda específica por ID (com JOIN nos dados do solicitante)
+// 5. Buscar detalhes de UMA demanda específica por ID (com dados do solicitante)
 app.get('/api/demands/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const query = `
-        SELECT 
-          d.id, d.location, d.description, d.status, d.created_at, 
-          u.id AS user_id, u.nome, u.matricula, u.cargo, u.unidade, u.setor, u.ramal
-        FROM demands d
-        JOIN users u ON d.user_id = u.id
-        WHERE d.id = $1;
-      `;
+            SELECT 
+              d.id, d.location, d.description, d.status, d.created_at, 
+              u.id AS user_id, u.nome, u.matricula, u.cargo, u.unidade, u.setor, u.ramal
+            FROM demands d
+            JOIN users u ON d.user_id = u.id
+            WHERE d.id = $1;
+        `;
         const result = await pool.query(query, [id]);
 
         if (result.rows.length === 0) {
@@ -160,30 +126,48 @@ app.get('/api/demands/:id', async (req, res) => {
     }
 });
 
-// 2. Listar as Demandas de um usuário específico (com prefixo /user/ para evitar conflito)
-app.get('/api/demands/user/:userId', async (req, res) => {
-    const { userId } = req.params;
+// 6. Criar nova Demanda
+app.post('/api/demands', async (req, res) => {
+    const { userId, location, description } = req.body;
     try {
-        const query = 'SELECT * FROM demands WHERE user_id = $1 ORDER BY created_at DESC';
-        const result = await pool.query(query, [userId]);
-        res.json(result.rows);
+        const query = `
+            INSERT INTO demands (user_id, location, description, status)
+            VALUES ($1, $2, $3, 'Pendente')
+            RETURNING id, location, description, status, created_at;
+        `;
+        const result = await pool.query(query, [userId, location, description]);
+        res.status(201).json({ message: 'Demanda aberta com sucesso!', demand: result.rows[0] });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Erro ao buscar demandas.' });
+        res.status(500).json({ error: 'Erro ao registrar demanda.' });
     }
 });
 
-//Criar uma Ordem de Serviço (OS) vinculada a uma Demanda
+// 7. Atualizar Status da Demanda (Manutenção)
+app.patch('/api/demands/:id/status', async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+    try {
+        const query = 'UPDATE demands SET status = $1 WHERE id = $2 RETURNING *;';
+        const result = await pool.query(query, [status, id]);
+        res.json({ message: 'Status atualizado!', demand: result.rows[0] });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro ao atualizar status.' });
+    }
+});
+
+// 8. Criar uma Ordem de Serviço (OS) vinculada a uma Demanda
 app.post('/api/demands/:demandId/os', async (req, res) => {
     const { demandId } = req.params;
     const { specialty, instructions } = req.body;
 
     try {
         const query = `
-        INSERT INTO ordens_servico (demand_id, specialty, instructions, status)
-        VALUES ($1, $2, $3, 'Aberta')
-        RETURNING *;
-      `;
+            INSERT INTO ordens_servico (demand_id, specialty, instructions, status)
+            VALUES ($1, $2, $3, 'Aberta')
+            RETURNING *;
+        `;
         const result = await pool.query(query, [demandId, specialty, instructions]);
         res.status(201).json({ message: 'Ordem de Serviço gerada com sucesso!', os: result.rows[0] });
     } catch (err) {
@@ -192,7 +176,7 @@ app.post('/api/demands/:demandId/os', async (req, res) => {
     }
 });
 
-//Listar todas as OSs de uma demanda específica
+// 9. Listar todas as OSs de uma demanda específica
 app.get('/api/demands/:demandId/os', async (req, res) => {
     const { demandId } = req.params;
     try {
@@ -204,7 +188,6 @@ app.get('/api/demands/:demandId/os', async (req, res) => {
         res.status(500).json({ error: 'Erro ao listar ordens de serviço.' });
     }
 });
-
 
 // Inicialização do Servidor
 const PORT = 3000;
