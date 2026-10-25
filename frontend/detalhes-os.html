@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGMaH - Gestão da Ordem de Serviço</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="dashboard-container" style="max-width: 1000px;">
+        <!-- Topbar -->
+        <header class="topbar">
+            <div class="topbar-brand">
+                <h2>SIGMaH</h2>
+                <span>Gerenciamento e Fechamento de OS</span>
+            </div>
+            <div class="user-profile-summary">
+                <button id="btnVoltar" class="btn-ghost-sm">← Voltar à Demanda</button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Informações Resumidas da OS -->
+            <section class="card-section">
+                <div class="section-header">
+                    <h3 id="osTitle">Carregando OS...</h3>
+                    <p>Detalhes técnicos da ordem de trabalho e controle de execução.</p>
+                </div>
+
+                <div class="demand-info-grid"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
+                    <div><strong>Especialidade:</strong> <span id="infoSpecialty">-</span></div>
+                    <div><strong>Data/Hora de Geração:</strong> <span id="infoCreatedAt">-</span></div>
+                    <div><strong>Local:</strong> <span id="infoLocation">-</span></div>
+                    <div><strong>Solicitante:</strong> <span id="infoSolicitante">-</span></div>
+                </div>
+
+                <div style="margin-top: 15px;">
+                    <strong>Instruções Iniciais para a Equipe:</strong>
+                    <p id="infoInstructions"
+                        style="background: var(--input-bg); padding: 12px; border-radius: 6px; margin-top: 5px; border: 1px solid var(--border);">
+                        -</p>
+                </div>
+            </section>
+
+            <!-- Formulário de Atualização e Fechamento da OS -->
+            <section class="card-section" style="margin-top: 25px;">
+                <div class="section-header">
+                    <h3>Atualização e Apontamentos Técnicos</h3>
+                    <p>Transcreva as informações do relatório físico preenchido em campo.</p>
+                </div>
+
+                <form id="osUpdateForm" style="display: flex; flex-direction: column; gap: 20px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Status da Ordem de
+                                Serviço</label>
+                            <select id="osStatus" required
+                                style="width: 100%; padding: 10px; border-radius: 6px; background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border);">
+                                <option value="Aberta">Aberta</option>
+                                <option value="Em Execução">Em Execução</option>
+                                <option value="Aguardando Peças">Aguardando Peças</option>
+                                <option value="Finalizada">Finalizada</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Data e Hora da
+                                Conclusão (Em campo)</label>
+                            <input type="datetime-local" id="osCompletedAt"
+                                style="width: 100%; padding: 10px; border-radius: 6px; background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border);">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Relatório Técnico / O que
+                            foi realizado (Transcrição do Manuscrito)</label>
+                        <textarea id="osExecutionNotes" rows="5"
+                            placeholder="Descreva o serviço executado conforme anotações do técnico no papel..."
+                            style="width: 100%; padding: 12px; border-radius: 6px; background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border); resize: vertical;"></textarea>
+                    </div>
+
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: 500;">Materiais e Peças
+                            Utilizados</label>
+                        <textarea id="osMaterials" rows="3"
+                            placeholder="Ex: 2x Disjuntor 32A, 5 metros de cabo flexível 6mm, fita isolante..."
+                            style="width: 100%; padding: 12px; border-radius: 6px; background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border); resize: vertical;"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary" style="align-self: flex-start; padding: 12px 25px;">Salvar
+                        Alterações da OS</button>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+    <script src="detalhes-os.js"></script>
+</body>
+
+</html>

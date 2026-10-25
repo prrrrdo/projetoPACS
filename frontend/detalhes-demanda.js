@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     try {
       const response = await fetch(`http://localhost:3000/api/demands/${demandId}`);
       if (!response.ok) throw new Error('Demanda não encontrada.');
-      
+
       const d = await response.json();
       dadosDemandaAtual = d;
 
@@ -64,14 +64,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       osTableBody.innerHTML = oss.map(os => `
         <tr>
-          <td><strong>#OS-${os.id}</strong></td>
+          <td><a href="detalhes-os.html?id=${os.id}" style="color: var(--primary); font-weight: bold; text-decoration: none;">#OS-${os.id}</a></td>
           <td><span style="font-weight: 600; color: var(--primary);">${os.specialty}</span></td>
           <td>${os.instructions || 'Nenhuma instrução adicional.'}</td>
-          <td>${new Date(os.created_at).toLocaleDateString('pt-BR')}</td>
+          <td>${new Date(os.created_at).toLocaleString('pt-BR')}</td>
           <td>${os.status}</td>
-          <td>
+          <td style="display: flex; gap: 8px;">
+            <a href="detalhes-os.html?id=${os.id}" class="btn-ghost-sm" style="padding: 6px 12px; text-decoration: none; background: rgba(255,255,255,0.05);">Editar OS</a>
             <button onclick='imprimirOS(${JSON.stringify(os)})' class="btn-ghost-sm" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">
-              Imprimir OS
+              Imprimir
             </button>
           </td>
         </tr>
@@ -109,7 +110,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // --- 4. FUNÇÃO DE IMPRESSÃO ---
-  window.imprimirOS = function(os) {
+  window.imprimirOS = function (os) {
     document.getElementById('pDemandId').textContent = dadosDemandaAtual.id;
     document.getElementById('pDemandDate').textContent = new Date(dadosDemandaAtual.created_at).toLocaleDateString('pt-BR');
     document.getElementById('pLocation').textContent = dadosDemandaAtual.location;

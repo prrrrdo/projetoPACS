@@ -38,27 +38,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             const demands = await response.json();
 
             if (demands.length === 0) {
-                maintenanceTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted">Nenhuma demanda registrada no sistema.</td></tr>`;
+                maintenanceTableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted">Nenhuma demanda registrada no sistema.</td></tr>`;
                 return;
             }
 
             maintenanceTableBody.innerHTML = demands.map(d => `
-  <tr>
-    <td><a href="detalhes-demanda.html?id=${d.id}" style="color: var(--primary); font-weight: bold; text-decoration: none;">#${d.id}</a></td>
-    <td>${d.solicitante || 'Desconhecido'} (${d.unidade || 'N/A'})</td>
-    <td>${d.location}</td>
-    <td>${d.description}</td>
-    <td>${new Date(d.created_at).toLocaleDateString('pt-BR')}</td>
-    <td><span style="font-weight: 600;">${d.status}</span></td>
-    <td>
-      <a href="detalhes-demanda.html?id=${d.id}" class="btn-ghost-sm" style="padding: 4px 8px; text-decoration: none; font-size: 12px;">Gerenciar OS</a>
-    </td>
-  </tr>
-`).join('');
+                <tr>
+                    <td><a href="detalhes-demanda.html?id=${d.id}" style="color: var(--primary); font-weight: bold; text-decoration: none;">#${d.id}</a></td>
+                    <td>${d.solicitante || 'Desconhecido'} (${d.unidade || 'N/A'})</td>
+                    <td>${d.location}</td>
+                    <td>${d.description}</td>
+                    <td>${new Date(d.created_at).toLocaleDateString('pt-BR')}</td>
+                    <td><span style="font-weight: 600;">${d.status}</span></td>
+                </tr>
+            `).join('');
 
         } catch (error) {
             console.error('Erro ao carregar demandas:', error);
-            maintenanceTableBody.innerHTML = `<tr><td colspan="7" class="text-center text-muted" style="color: #ef4444;">Erro ao conectar com o servidor.</td></tr>`;
+            maintenanceTableBody.innerHTML = `<tr><td colspan="6" class="text-center text-muted" style="color: #ef4444;">Erro ao conectar com o servidor.</td></tr>`;
         }
     }
 

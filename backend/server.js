@@ -194,3 +194,54 @@ const PORT = 3000;
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
+
+// 10. Buscar detalhes de uma OS específica (com dados da demanda e do solicitante)
+app.get('/api/os/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const query = `
+            SELECT 
+                os.*, 
+                d.location, d.description as demand_description, d.created_at as demand_date,
+                u.nome as solicitante, u.unidade, u.setor
+            FROM ordens_servico os
+            JOIN demands d ON os.demand_id = d.id
+            JOIN users u ON d.user_id = u.id
+            WHERE os.id = $1;
+        `;
+        const result = await pool.query(query, [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Ordem de Serviço não encontrada.' });
+        }
+
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro ao buscar OS.' });
+    }
+});
+
+// 11 Atualizar dados de uma OS (Status, Anotações, Materiais e Data/Hora de Conclusão)
+app.patch('/api/os/:id', async (req, res) => {
+    const { id } = req.params;
+    const { status, execution_notes, materials_used, completed_at } = req.body;
+
+    try {
+        const query = `
+            UPDATE ordens_servico 
+            SET status = COALESCE($1, status), 
+                execution_notes = COALESCE($2, execution_notes), 
+                materials_used = COALESCE($3, materials_used),
+                completed_at = COALESCE(NULLIF($4, '')::timestamp, completed_at)
+            WHERE id = $5 
+            RETURNING *;
+        `;
+        const result = await pool.query(query, [status, execution_notes, materials_used, completed_at, id]);
+
+        res.json({ message: 'Ordem de Serviço atualizada com sucesso!', os: result.rows[0] });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro ao atualizar Ordem de Serviço.' });
+    }
+});
