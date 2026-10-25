@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIGMaH - Detalhes da Demanda e Ordens de Serviço</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <div class="dashboard-container" style="max-width: 1100px;">
+    <!-- Topbar -->
+    <header class="topbar">
+      <div class="topbar-brand">
+        <h2>SIGMaH</h2>
+        <span>Gerenciamento de Demanda e OS</span>
+      </div>
+      <div class="user-profile-summary">
+        <button onclick="window.location.href='manutencao.html'" class="btn-ghost-sm">← Voltar ao Painel</button>
+      </div>
+    </header>
+
+    <!-- Main Content (Tela) -->
+    <main class="dashboard-main">
+      <!-- Card de Informações da Demanda -->
+      <section class="card-section">
+        <div class="section-header">
+          <h3 id="demandTitle">Carregando demanda...</h3>
+          <p>Informações consolidadas do chamado aberto pelo setor.</p>
+        </div>
+
+        <div class="demand-info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
+          <div><strong>Solicitante:</strong> <span id="infoNome">-</span></div>
+          <div><strong>Matrícula:</strong> <span id="infoMatricula">-</span></div>
+          <div><strong>Cargo:</strong> <span id="infoCargo">-</span></div>
+          <div><strong>Ramal:</strong> <span id="infoRamal">-</span></div>
+          <div><strong>Unidade / Setor:</strong> <span id="infoLocalSetor">-</span></div>
+          <div><strong>Ambiente / Local:</strong> <span id="infoLocation">-</span></div>
+        </div>
+
+        <div style="margin-top: 15px;">
+          <strong>Descrição do Problema Relatado:</strong>
+          <p id="infoDescription" style="background: var(--input-bg); padding: 12px; border-radius: 6px; margin-top: 5px; border: 1px solid var(--border);">-</p>
+        </div>
+      </section>
+
+      <!-- Card para Criar Nova OS -->
+      <section class="card-section" style="margin-top: 25px;">
+        <div class="section-header">
+          <h3>Emitir Nova Ordem de Serviço (OS)</h3>
+          <p>Divida a demanda por especialidades técnicas necessárias para a solução.</p>
+        </div>
+
+        <form id="osForm" style="display: flex; flex-direction: column; gap: 15px;">
+          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px;">
+            <div>
+              <label style="display: block; margin-bottom: 5px; font-weight: 500;">Especialidade da Equipe</label>
+              <select id="osSpecialty" required style="width: 100%; padding: 10px; border-radius: 6px; background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border);">
+                <option value="" disabled selected>Selecione a equipe...</option>
+                <option value="Elétrica">Elétrica</option>
+                <option value="Hidráulica">Hidráulica</option>
+                <option value="Marcenaria">Marcenaria</option>
+                <option value="Serralheria">Serralheria</option>
+                <option value="Gasistas">Gasistas</option>
+                <option value="Biomédica">Biomédica</option>
+                <option value="Refrigeração">Refrigeração</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; margin-bottom: 5px; font-weight: 500;">Instruções para o Técnico / Equipe</label>
+              <input type="text" id="osInstructions" placeholder="Ex: Verificar disjuntor principal e fiação do chuveiro..." style="width: 100%; padding: 10px; border-radius: 6px; background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border);">
+            </div>
+          </div>
+          <button type="submit" class="btn-primary" style="align-self: flex-start; padding: 10px 20px;">Gerar Ordem de Serviço</button>
+        </form>
+      </section>
+
+      <!-- Lista de OSs Geradas para esta Demanda -->
+      <section class="card-section" style="margin-top: 25px;">
+        <div class="section-header">
+          <h3>Ordens de Serviço (OS) Emitidas para esta Demanda</h3>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Nº OS</th>
+                <th>Especialidade</th>
+                <th>Instruções</th>
+                <th>Data de Abertura</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="osTableBody">
+              <tr><td colspan="6" class="text-center text-muted">Carregando OSs...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- TEMPLATE OCULTO PARA IMPRESSÃO DA OS (PDF) -->
+  <!-- ========================================== -->
+  <div id="printTemplate" class="print-only">
+    <div class="print-header">
+      <h2>SIGMaH - Sistema Integrado de Gestão de Manutenção Hospitalar</h2>
+      <h3>ORDEM DE SERVIÇO TÉCNICO (OS)</h3>
+    </div>
+
+    <div class="print-box">
+      <h4>1. Dados do Chamado / Demanda</h4>
+      <p><strong>Nº da Demanda:</strong> <span id="pDemandId">-</span> | <strong>Data de Abertura:</strong> <span id="pDemandDate">-</span></p>
+      <p><strong>Local / Ambiente:</strong> <span id="pLocation">-</span></p>
+      <p><strong>Descrição do Problema:</strong> <span id="pDescription">-</span></p>
+    </div>
+
+    <div class="print-box">
+      <h4>2. Dados do Solicitante</h4>
+      <p><strong>Nome:</strong> <span id="pNome">-</span> | <strong>Matrícula:</strong> <span id="pMatricula">-</span> | <strong>Cargo:</strong> <span id="pCargo">-</span></p>
+      <p><strong>Unidade / Setor:</strong> <span id="pUnidadeSetor">-</span> | <strong>Ramal:</strong> <span id="pRamal">-</span></p>
+    </div>
+
+    <div class="print-box">
+      <h4>3. Atribuição da Ordem de Serviço</h4>
+      <p><strong>Nº da OS:</strong> <span id="pOsId">-</span> | <strong>Especialidade Responsável:</strong> <span id="pSpecialty">-</span></p>
+      <p><strong>Instruções do Gestor:</strong> <span id="pInstructions">-</span></p>
+    </div>
+
+    <div class="print-box large-box">
+      <h4>4. Serviço Realizado e Materiais / Equipamentos Utilizados (Preenchimento Manual)</h4>
+      <div class="handwriting-area"></div>
+    </div>
+
+    <div class="signatures-container">
+      <div class="signature-box">
+        <div class="signature-line"></div>
+        <p>Assinatura do Profissional Executante</p>
+      </div>
+      <div class="signature-box">
+        <div class="signature-line"></div>
+        <p>Assinatura do Solicitante (Atesto de Conclusão)</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
+  <script src="detalhes-demanda.js"></script>
+</body>
+</html>

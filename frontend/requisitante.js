@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // --- BUSCAR DEMANDAS DO BANCO PARA ESTE USUÁRIO ---
   async function carregarDemandas() {
     try {
-      const response = await fetch(`http://localhost:3000/api/demands/${user.id}`);
+      const response = await fetch(`http://localhost:3000/api/demands/user/${user.id}`);
       const demands = await response.json();
 
       if (demands.length === 0) {

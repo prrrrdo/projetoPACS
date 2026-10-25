@@ -135,6 +135,77 @@ app.get('/api/demands/:userId', async (req, res) => {
     }
 });
 
+// 1. Buscar detalhes de UMA demanda específica por ID (com JOIN nos dados do solicitante)
+app.get('/api/demands/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const query = `
+        SELECT 
+          d.id, d.location, d.description, d.status, d.created_at, 
+          u.id AS user_id, u.nome, u.matricula, u.cargo, u.unidade, u.setor, u.ramal
+        FROM demands d
+        JOIN users u ON d.user_id = u.id
+        WHERE d.id = $1;
+      `;
+        const result = await pool.query(query, [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Demanda não encontrada.' });
+        }
+
+        res.json(result.rows[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro ao buscar detalhes da demanda.' });
+    }
+});
+
+// 2. Listar as Demandas de um usuário específico (com prefixo /user/ para evitar conflito)
+app.get('/api/demands/user/:userId', async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const query = 'SELECT * FROM demands WHERE user_id = $1 ORDER BY created_at DESC';
+        const result = await pool.query(query, [userId]);
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro ao buscar demandas.' });
+    }
+});
+
+//Criar uma Ordem de Serviço (OS) vinculada a uma Demanda
+app.post('/api/demands/:demandId/os', async (req, res) => {
+    const { demandId } = req.params;
+    const { specialty, instructions } = req.body;
+
+    try {
+        const query = `
+        INSERT INTO ordens_servico (demand_id, specialty, instructions, status)
+        VALUES ($1, $2, $3, 'Aberta')
+        RETURNING *;
+      `;
+        const result = await pool.query(query, [demandId, specialty, instructions]);
+        res.status(201).json({ message: 'Ordem de Serviço gerada com sucesso!', os: result.rows[0] });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro ao criar Ordem de Serviço.' });
+    }
+});
+
+//Listar todas as OSs de uma demanda específica
+app.get('/api/demands/:demandId/os', async (req, res) => {
+    const { demandId } = req.params;
+    try {
+        const query = `SELECT * FROM ordens_servico WHERE demand_id = $1 ORDER BY created_at DESC;`;
+        const result = await pool.query(query, [demandId]);
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro ao listar ordens de serviço.' });
+    }
+});
+
+
 // Inicialização do Servidor
 const PORT = 3000;
 app.listen(PORT, () => {
