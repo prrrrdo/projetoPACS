@@ -26,16 +26,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     }, 4000);
   }
 
+  // --- CARREGAR CONTRATOS NO SELECT DA NOVA OS ---
+  async function carregarContratosSelect() {
+    try {
+      const response = await fetch('http://localhost:3000/api/contratos');
+      const contratos = await response.json();
+      const select = document.getElementById('osContrato');
+
+      if (!select) return;
+
+      contratos.forEach(c => {
+        const option = document.createElement('option');
+        option.value = c.id;
+        option.textContent = `${c.empresa_nome} - Contrato: ${c.numero_contrato}`;
+        select.appendChild(option);
+      });
+    } catch (error) {
+      console.error('Erro ao carregar contratos:', error);
+    }
+  }
+
   // --- 1. BUSCAR DADOS DA DEMANDA ---
   async function carregarDetalhesDemanda() {
     try {
       const response = await fetch(`http://localhost:3000/api/demands/${demandId}`);
       if (!response.ok) throw new Error('Demanda não encontrada.');
-
+      
       const d = await response.json();
       dadosDemandaAtual = d;
 
-      // Preenche os campos na tela
       document.getElementById('demandTitle').textContent = `Demanda Protocolo #${d.id}`;
       document.getElementById('infoNome').textContent = d.nome || 'Não informado';
       document.getElementById('infoMatricula').textContent = d.matricula || 'Não informada';
@@ -89,12 +108,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     e.preventDefault();
     const specialty = document.getElementById('osSpecialty').value;
     const instructions = document.getElementById('osInstructions').value.trim();
+    const contrato_id = document.getElementById('osContrato').value;
 
     try {
       const response = await fetch(`http://localhost:3000/api/demands/${demandId}/os`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ specialty, instructions })
+        body: JSON.stringify({ specialty, instructions, contrato_id })
       });
 
       const data = await response.json();
@@ -110,7 +130,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // --- 4. FUNÇÃO DE IMPRESSÃO ---
-  window.imprimirOS = function (os) {
+  window.imprimirOS = function(os) {
     document.getElementById('pDemandId').textContent = dadosDemandaAtual.id;
     document.getElementById('pDemandDate').textContent = new Date(dadosDemandaAtual.created_at).toLocaleDateString('pt-BR');
     document.getElementById('pLocation').textContent = dadosDemandaAtual.location;
@@ -130,5 +150,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   };
 
   carregarDetalhesDemanda();
+  carregarContratosSelect();
   carregarOSs();
 });

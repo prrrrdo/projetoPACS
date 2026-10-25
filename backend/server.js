@@ -157,18 +157,18 @@ app.patch('/api/demands/:id/status', async (req, res) => {
     }
 });
 
-// 8. Criar uma Ordem de Serviço (OS) vinculada a uma Demanda
+// 8. Ajustar a criação de OS para receber o contrato_id
 app.post('/api/demands/:demandId/os', async (req, res) => {
     const { demandId } = req.params;
-    const { specialty, instructions } = req.body;
+    const { specialty, instructions, contrato_id } = req.body;
 
     try {
         const query = `
-            INSERT INTO ordens_servico (demand_id, specialty, instructions, status)
-            VALUES ($1, $2, $3, 'Aberta')
+            INSERT INTO ordens_servico (demand_id, specialty, instructions, contrato_id, status)
+            VALUES ($1, $2, $3, $4, 'Aberta')
             RETURNING *;
         `;
-        const result = await pool.query(query, [demandId, specialty, instructions]);
+        const result = await pool.query(query, [demandId, specialty, instructions, contrato_id || null]);
         res.status(201).json({ message: 'Ordem de Serviço gerada com sucesso!', os: result.rows[0] });
     } catch (err) {
         console.error(err);
@@ -195,7 +195,7 @@ app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
 
-// 10. Buscar detalhes de uma OS específica (com dados da demanda e do solicitante)
+// 10. Ajustar a rota de detalhes da OS (/api/os/:id) para trazer os dados da empresa e contrato
 app.get('/api/os/:id', async (req, res) => {
     const { id } = req.params;
     try {
@@ -203,10 +203,14 @@ app.get('/api/os/:id', async (req, res) => {
             SELECT 
                 os.*, 
                 d.location, d.description as demand_description, d.created_at as demand_date,
-                u.nome as solicitante, u.unidade, u.setor
+                u.nome as solicitante, u.unidade, u.setor,
+                c.numero_contrato, c.objeto as contrato_objeto,
+                e.nome as empresa_nome, e.cnpj as empresa_cnpj
             FROM ordens_servico os
             JOIN demands d ON os.demand_id = d.id
             JOIN users u ON d.user_id = u.id
+            LEFT JOIN contratos c ON os.contrato_id = c.id
+            LEFT JOIN empresas e ON c.empresa_id = e.id
             WHERE os.id = $1;
         `;
         const result = await pool.query(query, [id]);
@@ -222,10 +226,10 @@ app.get('/api/os/:id', async (req, res) => {
     }
 });
 
-// 11 Atualizar dados de uma OS (Status, Anotações, Materiais e Data/Hora de Conclusão)
+// 11 Ajustar o PATCH da OS para atualizar também o contrato_id
 app.patch('/api/os/:id', async (req, res) => {
     const { id } = req.params;
-    const { status, execution_notes, materials_used, completed_at } = req.body;
+    const { status, execution_notes, materials_used, completed_at, contrato_id } = req.body;
 
     try {
         const query = `
@@ -233,15 +237,33 @@ app.patch('/api/os/:id', async (req, res) => {
             SET status = COALESCE($1, status), 
                 execution_notes = COALESCE($2, execution_notes), 
                 materials_used = COALESCE($3, materials_used),
-                completed_at = COALESCE(NULLIF($4, '')::timestamp, completed_at)
-            WHERE id = $5 
+                completed_at = COALESCE(NULLIF($4, '')::timestamp, completed_at),
+                contrato_id = COALESCE($5, contrato_id)
+            WHERE id = $6 
             RETURNING *;
         `;
-        const result = await pool.query(query, [status, execution_notes, materials_used, completed_at, id]);
+        const result = await pool.query(query, [status, execution_notes, materials_used, completed_at, contrato_id || null, id]);
 
         res.json({ message: 'Ordem de Serviço atualizada com sucesso!', os: result.rows[0] });
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Erro ao atualizar Ordem de Serviço.' });
+    }
+});
+
+// 12. Listar Empresas e Contratos (para preencher selects no front-end)
+app.get('/api/contratos', async (req, res) => {
+    try {
+        const query = `
+            SELECT c.id, c.numero_contrato, c.objeto, e.nome AS empresa_nome 
+            FROM contratos c
+            JOIN empresas e ON c.empresa_id = e.id
+            ORDER BY e.nome ASC;
+        `;
+        const result = await pool.query(query);
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Erro ao listar contratos.' });
     }
 });
