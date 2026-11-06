@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGMaH - Gestão da Ordem de Serviço</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/painel.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header class="topbar">
+            <div class="topbar-brand">
+                <h2>SIGMaH</h2>
+                <span>Gerenciamento e Fechamento de OS</span>
+            </div>
+            <div class="user-profile-summary">
+                <button id="btnVoltar" class="btn-ghost-sm">← Voltar à Demanda</button>
+            </div>
+        </header>
+
+        <main class="dashboard-main">
+            <section class="card-section">
+                <div class="section-header">
+                    <h3 id="osTitle">Carregando OS...</h3>
+                    <p>Detalhes técnicos da ordem de trabalho e controle de execução.</p>
+                </div>
+
+                <div class="demand-info-grid">
+                    <div><strong>Especialidade:</strong> <span id="infoSpecialty">-</span></div>
+                    <div><strong>Data/Hora de Geração:</strong> <span id="infoCreatedAt">-</span></div>
+                    <div><strong>Local:</strong> <span id="infoLocation">-</span></div>
+                    <div><strong>Solicitante:</strong> <span id="infoSolicitante">-</span></div>
+                </div>
+
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Empresa / Contrato Responsável</label>
+                    <select id="osContratoSelect">
+                        <option value="">Nenhum / Equipe Interna</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <strong>Instruções Iniciais para a Equipe:</strong>
+                    <p id="infoInstructions" class="info-description-box">-</p>
+                </div>
+            </section>
+
+            <section class="card-section">
+                <div class="section-header">
+                    <h3>Atualização e Apontamentos Técnicos</h3>
+                    <p>Transcreva as informações do relatório físico preenchido em campo.</p>
+                </div>
+
+                <form id="osUpdateForm">
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label>Status da Ordem de Serviço</label>
+                            <select id="osStatus" required>
+                                <option value="Aberta">Aberta</option>
+                                <option value="Em Execução">Em Execução</option>
+                                <option value="Aguardando Peças">Aguardando Peças</option>
+                                <option value="Finalizada">Finalizada</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Data e Hora da Conclusão (Em campo)</label>
+                            <input type="datetime-local" id="osCompletedAt">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Relatório Técnico / O que foi realizado</label>
+                        <textarea id="osExecutionNotes" rows="5" placeholder="Descreva o serviço executado..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Materiais e Peças Utilizados</label>
+                        <textarea id="osMaterials" rows="3" placeholder="Ex: 2x Disjuntor 32A..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Salvar Alterações da OS</button>
+                </form>
+            </section>
+        </main>
+    </div>
+
+    <div id="toastContainer" class="toast-container"></div>
+    <script src="js/detalhes-os.js"></script>
+</body>
+</html>

@@ -4,14 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SIGMaH - Painel do Requisitante</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/painel.css">
 </head>
 <body>
-  <div class="bg-glow bg-glow-1"></div>
-  <div class="bg-glow bg-glow-2"></div>
-
   <div class="dashboard-container">
-    <!-- Topbar -->
     <header class="topbar">
       <div class="topbar-brand">
         <h2>SIGMaH</h2>
@@ -23,19 +20,16 @@
       </div>
     </header>
 
-    <!-- Main Content -->
     <main class="dashboard-main">
-      <!-- Seção de Abertura de Demanda -->
       <section class="card-section">
         <div class="section-header">
           <h3>Nova Solicitação de Manutenção</h3>
           <p>Preencha os dados do chamado. Suas informações de contato são preenchidas automaticamente.</p>
         </div>
 
-        <form id="demandForm" class="demand-form">
-          <!-- Dados do Requisitante (Preenchidos Automaticamente) -->
-          <fieldset class="auto-filled-box">
-            <legend>Dados do Solicitante (Automático)</legend>
+        <form id="demandForm">
+          <fieldset class="info-description-box" style="margin-bottom: 20px;">
+            <legend style="padding: 0 8px; font-weight: 600;">Dados do Solicitante (Automático)</legend>
             <div class="form-grid-3">
               <div class="form-group">
                 <label>Nome</label>
@@ -50,7 +44,7 @@
                 <input type="text" id="reqRamal" readonly class="input-readonly">
               </div>
             </div>
-            <div class="form-grid-2" style="margin-top: 1rem;">
+            <div class="form-grid-2">
               <div class="form-group">
                 <label>Unidade</label>
                 <input type="text" id="reqUnit" readonly class="input-readonly">
@@ -62,8 +56,7 @@
             </div>
           </fieldset>
 
-          <!-- Dados do Problema -->
-          <div class="form-group" style="margin-top: 1.25rem;">
+          <div class="form-group">
             <label for="demandLocation">Ambiente / Localização do Problema *</label>
             <input type="text" id="demandLocation" placeholder="Ex: Sala 411, Ala Norte - Pediatria" required>
           </div>
@@ -73,14 +66,11 @@
             <textarea id="demandDescription" rows="4" placeholder="Descreva o problema elétrico, predial ou de equipamentos..." required></textarea>
           </div>
 
-          <div class="form-actions-right">
-            <button type="submit" class="btn btn-primary">Enviar Demanda para Manutenção</button>
-          </div>
+          <button type="submit" class="btn-primary">Enviar Demanda para Manutenção</button>
         </form>
       </section>
 
-      <!-- Minhas Demandas Recentes -->
-      <section class="card-section" style="margin-top: 2rem;">
+      <section class="card-section">
         <div class="section-header">
           <h3>Minhas Demandas Abertas</h3>
           <p>Acompanhe o status dos chamados solicitados por você</p>
@@ -97,7 +87,6 @@
               </tr>
             </thead>
             <tbody id="demandsTableBody">
-              <!-- Preenchido via JavaScript -->
               <tr>
                 <td colspan="5" class="text-center text-muted">Nenhuma demanda registrada recentemente.</td>
               </tr>
@@ -107,13 +96,12 @@
       </section>
     </main>
 
-    <!-- Footer -->
-    <footer class="app-footer">
+    <footer class="app-footer text-center text-muted" style="margin-top: 24px;">
       <p>&copy; 2026 SIGMaH • Gestão de Manutenção Hospitalar</p>
     </footer>
   </div>
 
   <div id="toastContainer" class="toast-container"></div>
-  <script src="requisitante.js"></script>
+  <script src="js/requisitante.js"></script>
 </body>
 </html>

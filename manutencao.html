@@ -4,14 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SIGMaH - Painel da Manutenção</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/global.css">
 </head>
 <body>
-  <div class="bg-glow bg-glow-1"></div>
-  <div class="bg-glow bg-glow-2"></div>
-
-  <div class="dashboard-container" style="max-width: 1100px;">
-    <!-- Topbar -->
+  <div class="dashboard-container">
     <header class="topbar">
       <div class="topbar-brand">
         <h2>SIGMaH</h2>
@@ -23,7 +19,6 @@
       </div>
     </header>
 
-    <!-- Main Content -->
     <main class="dashboard-main">
       <section class="card-section">
         <div class="section-header">
@@ -44,7 +39,6 @@
               </tr>
             </thead>
             <tbody id="maintenanceTableBody">
-              <!-- Preenchido via JavaScript -->
               <tr>
                 <td colspan="6" class="text-center text-muted">Carregando demandas...</td>
               </tr>
@@ -54,12 +48,12 @@
       </section>
     </main>
 
-    <footer class="app-footer">
+    <footer class="app-footer text-center text-muted" style="margin-top: 24px;">
       <p>&copy; 2026 SIGMaH • Gestão de Manutenção Hospitalar</p>
     </footer>
   </div>
 
   <div id="toastContainer" class="toast-container"></div>
-  <script src="manutencao.js"></script>
+  <script src="js/manutencao.js"></script>
 </body>
 </html>

@@ -4,14 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SIGMaH - Detalhes da Demanda e Ordens de Serviço</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/painel.css">
 </head>
 <body>
-  <div class="bg-glow bg-glow-1"></div>
-  <div class="bg-glow bg-glow-2"></div>
-
-  <div class="dashboard-container" style="max-width: 1100px;">
-    <!-- Topbar -->
+  <div class="dashboard-container">
     <header class="topbar">
       <div class="topbar-brand">
         <h2>SIGMaH</h2>
@@ -22,16 +19,14 @@
       </div>
     </header>
 
-    <!-- Main Content (Tela) -->
     <main class="dashboard-main">
-      <!-- Card de Informações da Demanda -->
       <section class="card-section">
         <div class="section-header">
           <h3 id="demandTitle">Carregando demanda...</h3>
           <p>Informações consolidadas do chamado aberto pelo setor.</p>
         </div>
 
-        <div class="demand-info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
+        <div class="demand-info-grid">
           <div><strong>Solicitante:</strong> <span id="infoNome">-</span></div>
           <div><strong>Matrícula:</strong> <span id="infoMatricula">-</span></div>
           <div><strong>Cargo:</strong> <span id="infoCargo">-</span></div>
@@ -40,24 +35,23 @@
           <div><strong>Ambiente / Local:</strong> <span id="infoLocation">-</span></div>
         </div>
 
-        <div style="margin-top: 15px;">
+        <div class="form-group" style="margin-top: 15px;">
           <strong>Descrição do Problema Relatado:</strong>
-          <p id="infoDescription" style="background: var(--input-bg); padding: 12px; border-radius: 6px; margin-top: 5px; border: 1px solid var(--border);">-</p>
+          <p id="infoDescription" class="info-description-box">-</p>
         </div>
       </section>
 
-      <!-- Card para Criar Nova OS -->
-      <section class="card-section" style="margin-top: 25px;">
+      <section class="card-section">
         <div class="section-header">
           <h3>Emitir Nova Ordem de Serviço (OS)</h3>
           <p>Divida a demanda por especialidades técnicas necessárias para a solução.</p>
         </div>
 
-        <form id="osForm" style="display: flex; flex-direction: column; gap: 15px;">
-          <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px;">
-            <div>
-              <label style="display: block; margin-bottom: 5px; font-weight: 500;">Especialidade da Equipe</label>
-              <select id="osSpecialty" required style="width: 100%; padding: 10px; border-radius: 6px; background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border);">
+        <form id="osForm">
+          <div class="form-grid-os">
+            <div class="form-group">
+              <label>Especialidade da Equipe</label>
+              <select id="osSpecialty" required>
                 <option value="" disabled selected>Selecione a equipe...</option>
                 <option value="Elétrica">Elétrica</option>
                 <option value="Hidráulica">Hidráulica</option>
@@ -68,25 +62,24 @@
                 <option value="Refrigeração">Refrigeração</option>
               </select>
             </div>
-            <div>
-              <label style="display: block; margin-bottom: 5px; font-weight: 500;">Instruções para o Técnico / Equipe</label>
-              <input type="text" id="osInstructions" placeholder="Ex: Verificar disjuntor principal e fiação do chuveiro..." style="width: 100%; padding: 10px; border-radius: 6px; background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border);">
+            <div class="form-group">
+              <label>Instruções para o Técnico / Equipe</label>
+              <input type="text" id="osInstructions" placeholder="Ex: Verificar disjuntor principal e fiação do chuveiro...">
             </div>
           </div>
 
-          <div style="margin-bottom: 15px;">
-            <label style="display: block; margin-bottom: 5px; font-weight: 500;">Empresa / Contrato Responsável</label>
-            <select id="osContrato" style="width: 100%; padding: 10px; border-radius: 6px; background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border);">
+          <div class="form-group">
+            <label>Empresa / Contrato Responsável</label>
+            <select id="osContrato">
               <option value="">Selecione o contrato (Opcional / Equipe Interna)</option>
             </select>
           </div>
 
-          <button type="submit" class="btn-primary" style="align-self: flex-start; padding: 10px 20px;">Gerar Ordem de Serviço</button>
+          <button type="submit" class="btn-primary">Gerar Ordem de Serviço</button>
         </form>
       </section>
 
-      <!-- Lista de OSs Geradas para esta Demanda -->
-      <section class="card-section" style="margin-top: 25px;">
+      <section class="card-section">
         <div class="section-header">
           <h3>Ordens de Serviço (OS) Emitidas para esta Demanda</h3>
         </div>
@@ -112,9 +105,7 @@
     </main>
   </div>
 
-  <!-- ========================================== -->
-  <!-- TEMPLATE OCULTO PARA IMPRESSÃO DA OS (PDF) -->
-  <!-- ========================================== -->
+  <!-- Template Oculto para Impressão da OS (PDF) -->
   <div id="printTemplate" class="print-only">
     <div class="print-header">
       <h2>SIGMaH - Sistema Integrado de Gestão de Manutenção Hospitalar</h2>
@@ -158,6 +149,6 @@
   </div>
 
   <div id="toastContainer" class="toast-container"></div>
-  <script src="detalhes-demanda.js"></script>
+  <script src="js/detalhes-demanda.js"></script>
 </body>
 </html>
