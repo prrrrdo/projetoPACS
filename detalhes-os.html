@@ -9,6 +9,7 @@
 </head>
 <body>
     <div class="dashboard-container">
+        <!-- Topbar -->
         <header class="topbar">
             <div class="topbar-brand">
                 <h2>SIGMaH</h2>
@@ -19,7 +20,9 @@
             </div>
         </header>
 
+        <!-- Main Content -->
         <main class="dashboard-main">
+            <!-- Informações Resumidas da OS -->
             <section class="card-section">
                 <div class="section-header">
                     <h3 id="osTitle">Carregando OS...</h3>
@@ -46,41 +49,84 @@
                 </div>
             </section>
 
+            <!-- Formulário de Atualização e Fechamento da OS (Ciclo de Vida + Auditoria) -->
             <section class="card-section">
                 <div class="section-header">
                     <h3>Atualização e Apontamentos Técnicos</h3>
-                    <p>Transcreva as informações do relatório físico preenchido em campo.</p>
+                    <p>Gerencie o ciclo de etapa, prioridade e registros da ordem de serviço.</p>
                 </div>
 
-                <form id="osUpdateForm">
+                <form id="osUpdateForm" style="display: flex; flex-direction: column; gap: 15px;">
                     <div class="form-grid-2">
                         <div class="form-group">
-                            <label>Status da Ordem de Serviço</label>
-                            <select id="osStatus" required>
+                            <label>Status / Etapa Atual</label>
+                            <select id="osStatus" required onchange="verificarCamposDinamicos()">
                                 <option value="Aberta">Aberta</option>
-                                <option value="Em Execução">Em Execução</option>
+                                <option value="Em Andamento">Em Andamento</option>
                                 <option value="Aguardando Peças">Aguardando Peças</option>
-                                <option value="Finalizada">Finalizada</option>
+                                <option value="Pendente">Pendente (Com Impedimento)</option>
+                                <option value="Concluída">Concluída (Técnico)</option>
+                                <option value="Finalizada">Finalizada / Aprovada (Fiscalização)</option>
                             </select>
                         </div>
                         <div class="form-group">
+                            <label>Prioridade</label>
+                            <select id="osPriority">
+                                <option value="BAIXA">Baixa</option>
+                                <option value="MEDIA">Média</option>
+                                <option value="ALTA">Alta</option>
+                                <option value="EMERGENCIA">Emergência</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Campo Condicional: Motivo da Pendência -->
+                    <div class="form-group" id="pendenciaContainer" style="display: none; border-left: 3px solid #ef4444; padding-left: 10px;">
+                        <label>Motivo da Pendência *</label>
+                        <select id="osPendingReason">
+                            <option value="" disabled selected>Selecione o motivo...</option>
+                            <option value="Falta de Material / Peça no Almoxarifado">Falta de Material / Peça no Almoxarifado</option>
+                            <option value="Equipamento Ocupado / Em Uso Clínico">Equipamento Ocupado / Em Uso Clínico</option>
+                            <option value="Aguardando Autorização de Terceiros / Contrato">Aguardando Autorização de Terceiros / Contrato</option>
+                            <option value="Falta de Acesso ao Local">Falta de Acesso ao Local</option>
+                        </select>
+                    </div>
+
+                    <!-- Campo Condicional: Anexo Obrigatório para Conclusão -->
+                    <div class="form-group" id="anexoContainer" style="display: none; border-left: 3px solid #10b981; padding-left: 10px;">
+                        <label>Anexo da OS Física Assinada (Link / Caminho) *</label>
+                        <input type="text" id="osAttachmentUrl" placeholder="Informe o link ou diretório do documento digitalizado...">
+                    </div>
+
+                    <div class="form-grid-2">
+                        <div class="form-group">
                             <label>Data e Hora da Conclusão (Em campo)</label>
                             <input type="datetime-local" id="osCompletedAt">
+                        </div>
+                        <div class="form-group">
+                            <label>Materiais e Peças Utilizados</label>
+                            <input type="text" id="osMaterials" placeholder="Ex: 2x Disjuntor 32A, 5m cabo...">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label>Relatório Técnico / O que foi realizado</label>
-                        <textarea id="osExecutionNotes" rows="5" placeholder="Descreva o serviço executado..."></textarea>
+                        <textarea id="osExecutionNotes" rows="4" placeholder="Descreva o serviço executado conforme anotações do técnico..."></textarea>
                     </div>
 
-                    <div class="form-group">
-                        <label>Materiais e Peças Utilizados</label>
-                        <textarea id="osMaterials" rows="3" placeholder="Ex: 2x Disjuntor 32A..."></textarea>
-                    </div>
-
-                    <button type="submit" class="btn-primary">Salvar Alterações da OS</button>
+                    <button type="submit" class="btn-primary" style="align-self: flex-start; padding: 12px 25px;">Salvar Alterações da OS</button>
                 </form>
+            </section>
+
+            <!-- Seção da Linha do Tempo / Histórico de Auditoria -->
+            <section class="card-section" style="margin-top: 25px;">
+                <div class="section-header">
+                    <h3>Histórico de Movimentações (Auditoria)</h3>
+                    <p>Rastreabilidade completa de todas as alterações de etapas e responsáveis.</p>
+                </div>
+                <div id="timelineContainer" style="display: flex; flex-direction: column; gap: 12px; margin-top: 15px;">
+                    <p class="text-muted">Carregando histórico...</p>
+                </div>
             </section>
         </main>
     </div>

@@ -2,19 +2,25 @@ const express = require('express');
 const { Pool } = require('pg');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-// Configuração da conexão com o PostgreSQL (pacs_db)
+app.use(express.static(path.join(__dirname)));
+
+// ÚNICA declaração correta da conexão com o PostgreSQL apontando para o container 'db'
 const pool = new Pool({
     user: 'postgres',
-    host: 'localhost',
+    host: 'db',
     database: 'pacs_db',
     password: 'pacsadmin',
     port: 5432,
 });
+
+// Configuração para servir os arquivos HTML, CSS e JS da raiz do projeto
+app.use(express.static(path.join(__dirname)));
 
 // 1. Cadastro de Usuário (requisitante)
 app.post('/api/register', async (req, res) => {
@@ -37,6 +43,7 @@ app.post('/api/register', async (req, res) => {
 
 // 2. Login
 app.post('/api/login', async (req, res) => {
+    console.log("Dados recebidos no login:", req.body); // <-- Adicione esta linha
     const { identifier, senha } = req.body;
     try {
         const query = 'SELECT * FROM users WHERE matricula = $1 OR email = $1';
@@ -265,5 +272,86 @@ app.get('/api/contratos', async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).json({ error: 'Erro ao listar contratos.' });
+    }
+});
+
+// ==========================================
+// ROTA: Buscar o histórico de auditoria (Timeline) da OS
+// ==========================================
+app.get('/api/os/:id/historico', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const historico = await pool.query(
+            'SELECT * FROM os_historicos WHERE ordem_servico_id = $1 ORDER BY created_at DESC',
+            [id]
+        );
+        res.json(historico.rows);
+    } catch (error) {
+        console.error('Erro ao buscar histórico:', error);
+        res.status(500).json({ error: 'Erro ao carregar o histórico de auditoria.' });
+    }
+});
+
+// ==========================================
+// ROTA: Atualizar OS e Registrar Auditoria Automaticamente
+// ==========================================
+app.patch('/api/os/:id', async (req, res) => {
+    const { id } = req.params;
+    const { 
+        status, 
+        priority, 
+        execution_notes, 
+        materials_used, 
+        attachment_url, 
+        pending_reason, 
+        contrato_id,
+        changed_by 
+    } = req.body;
+
+    try {
+        // Busca o status anterior da OS para registrar corretamente no histórico
+        const osAtual = await pool.query('SELECT status FROM ordens_servico WHERE id = $1', [id]);
+        if (osAtual.rows.length === 0) {
+            return res.status(404).json({ error: 'Ordem de Serviço não encontrada.' });
+        }
+        const previousStatus = osAtual.rows[0].status;
+
+        // Validações de Negócio
+        if (status === 'Concluída' && !attachment_url) {
+            return res.status(400).json({ error: 'O anexo da OS física assinada é obrigatório para concluir o serviço.' });
+        }
+        if (status === 'Pendente' && !pending_reason) {
+            return res.status(400).json({ error: 'O motivo da pendência deve ser selecionado.' });
+        }
+
+        // Executa o Update na tabela ordens_servico
+        const updateQuery = `
+            UPDATE ordens_servico 
+            SET status = $1, 
+                priority = COALESCE(NULLIF($2, ''), priority)::os_prioridade, 
+                execution_notes = $3, 
+                materials_used = $4, 
+                attachment_url = $5, 
+                pending_reason = $6, 
+                contrato_id = $7,
+                completed_at = CASE WHEN $1 = 'Concluída' THEN CURRENT_TIMESTAMP ELSE completed_at END
+            WHERE id = $8 
+            RETURNING *;
+        `;
+        const values = [status, priority, execution_notes, materials_used, attachment_url, pending_reason, contrato_id || null, id];
+        const updatedOs = await pool.query(updateQuery, values);
+
+        // Insere o registro de auditoria na tabela os_historicos
+        const observacaoLog = execution_notes || `Status alterado de "${previousStatus || 'Início'}" para "${status}"`;
+        await pool.query(
+            `INSERT INTO os_historicos (ordem_servico_id, previous_status, new_status, changed_by, observations) 
+             VALUES ($1, $2, $3, $4, $5)`,
+            [id, previousStatus, status, changed_by || 'Equipe Técnica', observacaoLog]
+        );
+
+        res.json({ message: 'Ordem de Serviço atualizada com sucesso!', os: updatedOs.rows[0] });
+    } catch (error) {
+        console.error('Erro ao atualizar OS:', error);
+        res.status(500).json({ error: 'Erro interno ao atualizar Ordem de Serviço.' });
     }
 });
