@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     if (!osId) {
         alert('Nenhuma Ordem de Serviço selecionada.');
-        window.location.href = 'manutencao.html';
+        window.location.href = '/manutencao.html';
         return;
     }
 
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- CARREGAR CONTRATOS NO SELECT ---
     async function carregarContratosNoSelect(contratoAtualId) {
         try {
-            const response = await fetch('http://localhost:3000/api/contratos');
+            const response = await fetch('/api/contratos');
             const contratos = await response.json();
             const select = document.getElementById('osContratoSelect');
 
@@ -77,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!timelineContainer) return;
 
         try {
-            const response = await fetch(`http://localhost:3000/api/os/${osId}/historico`);
+            const response = await fetch(`/api/os/${osId}/historico`);
             const historicos = await response.json();
 
             if (historicos.length === 0) {
@@ -110,14 +110,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- CARREGAR DADOS DA OS ---
     async function carregarDetalhesOS() {
         try {
-            const response = await fetch(`http://localhost:3000/api/os/${osId}`);
+            const response = await fetch(`/api/os/${osId}`);
             if (!response.ok) throw new Error('OS não encontrada.');
 
             const os = await response.json();
             demandIdGlobal = os.demand_id;
 
             btnVoltar.onclick = () => {
-                window.location.href = `detalhes-demanda.html?id=${os.demand_id}`;
+                window.location.href = `/detalhes-demanda.html?id=${os.demand_id}`;
             };
 
             document.getElementById('osTitle').textContent = `Ordem de Serviço #OS-${os.id} (Demanda #${os.demand_id})`;
@@ -172,13 +172,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         const execution_notes = document.getElementById('osExecutionNotes').value.trim();
         const materials_used = document.getElementById('osMaterials').value.trim();
         const contrato_id = document.getElementById('osContratoSelect') ? document.getElementById('osContratoSelect').value : null;
-
-        // Recupera o usuário logado para registrar na auditoria
-        const storedUser = localStorage.getItem('sigmah_user');
-        const usuarioLogado = storedUser ? JSON.parse(storedUser).nome : 'Equipe Técnica';
-
-        try {
-            const response = await fetch(`http://localhost:3000/api/os/${osId}`, {
+try {
+            const response = await fetch(`/api/os/${osId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
@@ -189,8 +184,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     completed_at, 
                     execution_notes, 
                     materials_used, 
-                    contrato_id,
-                    changed_by: usuarioLogado
+                    contrato_id
                 })
             });
 

@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (!demandId) {
     alert('Nenhuma demanda selecionada.');
-    window.location.href = 'manutencao.html';
+    window.location.href = '/manutencao.html';
     return;
   }
 
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // --- CARREGAR CONTRATOS NO SELECT DA NOVA OS ---
   async function carregarContratosSelect() {
     try {
-      const response = await fetch('http://localhost:3000/api/contratos');
+      const response = await fetch('/api/contratos');
       const contratos = await response.json();
       const select = document.getElementById('osContrato');
 
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // --- 1. BUSCAR DADOS DA DEMANDA ---
   async function carregarDetalhesDemanda() {
     try {
-      const response = await fetch(`http://localhost:3000/api/demands/${demandId}`);
+      const response = await fetch(`/api/demands/${demandId}`);
       if (!response.ok) throw new Error('Demanda não encontrada.');
       
       const d = await response.json();
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   // --- 2. BUSCAR ORDENS DE SERVIÇO (OS) DESTA DEMANDA ---
   async function carregarOSs() {
     try {
-      const response = await fetch(`http://localhost:3000/api/demands/${demandId}/os`);
+      const response = await fetch(`/api/demands/${demandId}/os`);
       const oss = await response.json();
 
       if (oss.length === 0) {
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       osTableBody.innerHTML = oss.map(os => `
         <tr>
-          <td><a href="detalhes-os.html?id=${os.id}" style="color: var(--primary); font-weight: bold; text-decoration: none;">#OS-${os.id}</a></td>
+          <td><a href="/detalhes-os.html?id=${os.id}" style="color: var(--primary); font-weight: bold; text-decoration: none;">#OS-${os.id}</a></td>
           <td><span style="font-weight: 600; color: var(--primary);">${os.specialty}</span></td>
           <td>${os.instructions || 'Nenhuma instrução adicional.'}</td>
           <td>${new Date(os.created_at).toLocaleString('pt-BR')}</td>
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const contrato_id = document.getElementById('osContrato').value;
 
     try {
-      const response = await fetch(`http://localhost:3000/api/demands/${demandId}/os`, {
+      const response = await fetch(`/api/demands/${demandId}/os`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ specialty, instructions, contrato_id })

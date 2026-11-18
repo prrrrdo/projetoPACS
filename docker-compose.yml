@@ -2,35 +2,40 @@ services:
   db:
     image: postgres:16-alpine
     container_name: postgres_db
-    restart: always
-    environment:
-      # INSIRA AQUI O SEU USUÁRIO, SENHA E NOME DO BANCO REAIS:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: pacsadmin
-      POSTGRES_DB: pacs_db
+    restart: unless-stopped
+    env_file:
+      - .env
     ports:
       - "5433:5432"
     volumes:
       - pgdata16:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB:-pacs_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build: .
     container_name: api_backend
-    restart: always
+    restart: unless-stopped
     ports:
       - "3000:3000"
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
+    env_file:
+      - .env
     environment:
-      # ESTAS VARIÁVEIS DEVEM SER IDÊNTICAS ÀS ACIMA PARA A API ENCONTRAR O BANCO:
-      - DB_HOST=db
-      - DB_USER=postgres
-      - DB_PASSWORD=pacsadmin
-      - DB_NAME=pacs_db
-      - PORT=3000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:?Defina POSTGRES_PASSWORD no arquivo .env}
+      DB_NAME: ${POSTGRES_DB:-pacs_db}
+      PORT: 3000
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 volumes:
   pgdata16:
